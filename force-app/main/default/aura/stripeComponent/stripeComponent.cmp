@@ -1,0 +1,193 @@
+<aura:component controller="StripeIntegrationController" implements="force:appHostable,forceCommunity:availableForAllPageTypes" access="global">
+    <aura:attribute name="showStripeComponent" type="Boolean" default="false"/>
+    <aura:attribute name="amount" type="Double" default="0"/>
+    <aura:attribute name="cardNumber" type="String"/>
+    <aura:attribute name="expiryMonth" type="Integer"/>
+    <aura:attribute name="expiryYear" type="Integer"/>
+    <aura:attribute name="cvc" type="String"/>
+    <aura:attribute name="cardName" type="String"/>
+    <aura:attribute name="token" type="String"/>
+    <aura:attribute name="payType" type="String"/>
+    <aura:attribute name="stripePayId" type="String"/>
+    <aura:attribute name="fields1" type="List" default="[]" />
+    <aura:attribute name="fields2" type="List" default="[]" />
+    <aura:attribute name="fields3" type="List" default="[]" />
+    <aura:attribute name="fields4" type="List" default="[]" />
+    <aura:attribute name="fields5" type="List" default="[]" />
+    <aura:attribute name="errors" type="Object" default="{}"/>
+    <aura:attribute name="paAddress" type="String"/>
+    <aura:attribute name="paAddress1" type="String"/>
+    <aura:attribute name="paCity" type="String"/>
+    <aura:attribute name="paState" type="String"/>
+    <aura:attribute name="paZip" type="String"/>
+    <aura:attribute name="maAddress" type="String"/>
+    <aura:attribute name="maAddress1" type="String"/>
+    <aura:attribute name="maCity" type="String"/>
+    <aura:attribute name="maState" type="String"/>
+    <aura:attribute name="maZip" type="String"/>
+    <aura:attribute name="isChecked" type="Boolean" default="false" />
+    <aura:attribute name="error" type="string" />
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <!--Added new code-->
+    <aura:attribute name="recaptchaResponse" type="String"/> <!-- New attribute for storing reCAPTCHA response -->
+    <!--Ended new code-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <div class="slds-m-around--xx-large">
+        <lightning:card  class="slds-p-around_medium slds-align_absolute-center custom-card">
+            <div class="slds-modal_container ">
+                <header class="slds-modal_header">
+                    <h1 class="slds-text-heading_medium slds-hyphenate" style="font-weight: 900;color: #3072a7;font-size:xx-large;">
+                        Membership Form
+                    </h1>
+                    <div class="social-icons">
+                        <a href="{!$Label.c.FacebookURL}" target="_blank">
+                            <img  src="{!$Resource.icons8_facebook_50}" alt="Facebook" />
+                        </a>
+                        <a href="{!$Label.c.twitterURL}" target="_blank">
+                            <img  src="{!$Resource.icons8_twitter_30}" alt="Twitter" />
+                        </a>
+                        <a href="{!$Label.c.google_url}" target="_blank">
+                            <img  src="{!$Resource.icons8_google_plus_30}" alt="Facebook" />
+                        </a>
+                        <a href="{!$Label.c.tumblrURL}" target="_blank">
+                            <img  src="{!$Resource.icons8_tumblr_30}" alt="Twitter" />
+                        </a>
+                        <a href="{!$Label.c.pinterestURL}"  target="_blank">
+                            <img  src="{!$Resource.icons8_pinterest_30}" alt="Facebook" />
+                        </a>
+                        <a href="{!$Label.c.linkedinURL}"  target="_blank">
+                            <img  src="{!$Resource.icons8_linkedin_30}" alt="Twitter" />
+                        </a>
+                    </div>
+                </header>
+            </div>
+            <lightning:recordEditForm aura:id="form" objectApiName="Membership__c" onsubmit="{!c.handleSubmit}" 
+                                  onsuccess="{!c.handleSuccess}" ><!--onsuccess="{!c.handleSuccess}"-->
+                <!--lightning:messages /-->
+                <div class="slds-modal__content slds-p-around--large ">
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-2">
+                            <aura:iteration items="{!v.fields1}" var="fieldPath" indexVar="index">
+                                <aura:if isTrue="{!index lt v.fields1.length / 2}">
+                                    <lightning:inputField aura:id="field" fieldName="{!fieldPath}" required="true" />
+                                </aura:if>
+                            </aura:iteration>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <aura:iteration items="{!v.fields1}" var="fieldPath" indexVar="index">
+                                <aura:if isTrue="{!index ge v.fields1.length / 2}">
+                                    <lightning:inputField aura:id="field" fieldName="{!fieldPath}" required="true"/>
+                                </aura:if>
+                            </aura:iteration>
+                        </div>
+                    </div>
+                    <br/><h1 style="font-weight: bold;"> Physical Address</h1><br/>
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField  aura:id="paAddress" fieldName="Physical_Address__c" required="true" variant="label-hidden"  /><br/>
+                            <lightning:inputField  aura:id="paAddress1" fieldName="Physical_Address1__c"  variant="label-hidden"  /><br/><!--required="true"-->
+                            <lightning:inputField  aura:id="paCity" fieldName="City__c" required="true"  pattern="^[a-zA-Z]*$" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField  aura:id="paState" fieldName="State__c" required="true" pattern="^[a-zA-Z]*$" />
+                            <lightning:inputField  aura:id="paZip" fieldName="Zip__c" required="true"  />
+                        </div>
+                        
+                    </div>
+                    <br/><h1 style="font-weight: bold;"> Mailing Address</h1><br/>
+                    <lightning:input type="checkbox" label="SAME AS PHYSICAL" checked="{!v.isChecked}" onchange="{!c.handleCheckboxChange}" /><br/>
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="maAddress" fieldName="Mailing_Address__c" value="{!v.maAddress}" required="true"  variant="label-hidden"/><br/>
+                            <lightning:inputField aura:id="maAddress1" fieldName="Mailing_Address1__c" value="{!v.maAddress1}"  variant="label-hidden"/><br/><!--required="true"-->
+                            <lightning:inputField aura:id="maCity" fieldName="Mailing_CITY__c"  value="{!v.maCity}" required="true" />
+                         </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning:inputField aura:id="maState" fieldName="Mailing_State__c" value="{!v.maState}" required="true"  />
+                            <lightning:inputField aura:id="maZip" fieldName="Mailing_Zip__c" value="{!v.maZip}" required="true"  />
+                        </div>
+                    </div><br/><br/>
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-2">
+                            <aura:iteration items="{!v.fields4}" var="fieldPath" indexVar="index">
+                                <aura:if isTrue="{!index lt v.fields4.length / 2}">
+                                    <lightning:inputField aura:id="field" fieldName="{!fieldPath}" required="true"/>
+                                </aura:if>
+                            </aura:iteration>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <aura:iteration items="{!v.fields4}" var="fieldPath" indexVar="index">
+                                <aura:if isTrue="{!index ge v.fields4.length / 2}">
+                                    <lightning:inputField aura:id="field" fieldName="{!fieldPath}" required="{!fieldPath != 'WEBSITE__c' &amp;&amp; fieldPath != 'OTHER_IMPORTANT_CONTACTS__c'}" /><!--"true"-->
+                                </aura:if>
+                            </aura:iteration>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-grid">
+                        <aura:iteration items="{!v.fields5}" var="fieldPath" indexVar="index">
+                                <lightning:inputField class="highlight-red" aura:id="field" fieldName="{!fieldPath}" required="true"/>
+                        </aura:iteration>
+                </div>
+                <div class="slds-grid">
+                    <lightning:inputField class="highlight-red" aura:id="field" label="PAYMENT TYPE" fieldName="PAYMENT_TYPE__c"  value="{!v.payType}" required="true"/>
+                </div>
+                <div class="slds-grid">
+                    <lightning:inputField  aura:id="field" label="AMOUNT TO PAY" fieldName="AMOUNT_TO_PAY__c"  value="{!v.amount}" required="true"/>
+                    <p style="font-style: italic; color:red" class="note">Additional Processing fee of 3% will be charged</p><br/>
+                </div>
+                <!--p style="font-style: italic; color:red" class="note">Additional Processing fee will be charged</p><br/-->
+                <div class="button-container">
+                    <aura:if isTrue="{!v.payType == 'Credit Card'}">
+                        <lightning:button class="slds-button slds-button_brand" variant="brand"  label="Pay through CC" onclick="{!c.paythrughstripe}"/>
+                    </aura:if>
+                    <aura:if isTrue="{!v.payType != 'Credit Card'}">
+                        <lightning:button class="slds-button slds-button_brand" variant="brand"  name="save" label="Save" onclick="{!c.handleSubmit}"/>
+                    </aura:if>
+                    <br/>
+                </div>
+                <p style="font-style: italic; color:red">* This application is not valid until approval from DMA and payment is received.</p>
+            </lightning:recordEditForm>
+        </lightning:card>
+    </div>
+    <!--ended new code-->
+    <div class="slds-m-around_xx-large">
+    <aura:if isTrue="{!v.showStripeComponent}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.handleCancel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Credit Card Payment</h2>
+                </header>
+                <div class="slds-grid slds-wrap">
+                    <div class="slds-col slds-size_1-of-2" style="width:50%">
+                        <span>
+                              <lightning:input class="myCustomClass" label="Name On Card" type="text" id="cardName" aura:id="cardName" placeholder="Name On Card" value="{!v.cardName}" required="true"/>
+                          	  <lightning:input class="myCustomClass" label="Expiry Month" type="text" id="expiryMonth" aura:id="expiryMonth" placeholder="MM" value="{!v.expiryMonth}" required="true"/>
+                              <lightning:input class="myCustomClass" label="CVC" type="text" id="cvc" aura:id="cvc" placeholder="CVC" value="{!v.cvc}" required="true"/>
+                    	</span>
+                        </div>
+                    <div class="slds-col slds-size_1-of-2 " style="width:50%">
+                        <span>
+                                <lightning:input class="myCustomClass" label="Card Number" type="text" id="cardNumber" aura:id="cardNumber" placeholder="Card Number" value="{!v.cardNumber}" required="true"/>
+                                <lightning:input class="myCustomClass" label="Expiry Year" type="text" id="expiryYear" aura:id="expiryYear" placeholder="YYYY" value="{!v.expiryYear}" required="true"/>
+                                <lightning:input class="myCustomClass" label="Amount" type="Decimal" id="amount" aura:id="amount" placeholder="Amount" value="{!v.amount}" required="true" readonly="true"/>
+                    </span>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{!c.handleCancel}">Cancel</button>
+                    <button class="slds-button slds-button_brand"  onclick="{!c.makePayment}">
+                        Make Payment
+                    </button>
+                </footer>
+            </div>
+        </section>
+    </aura:if>
+</div>
+</aura:component>

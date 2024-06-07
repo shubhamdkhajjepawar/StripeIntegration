@@ -1,0 +1,108 @@
+.THIS {
+}
+
+.THIS .social-icons {
+    display: flex;
+}
+
+.THIS .social-icons a {
+    margin-right: 05px; /* Adjust spacing between icons */
+}
+
+.THIS .social-icons img {
+    width: 20px; /* Adjust the size of icons */
+    height: auto;
+}
+.THIS .custom-card {
+    width: 1000px; /* Adjust the width as needed */
+}
+
+.THIS .button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.THIS .button-container button {
+    width: 100%; /* Make the button take full width */
+}
+
+.THIS .slds-grid.slds-wrap {
+    background: honeydew;
+    align-content: center;
+}
+
+.THIS .slds-modal__content.slds-p-around--large {
+    width: 900px !important;
+}
+.THIS article.slds-card.slds-p-around_medium.slds-align_absolute-center.custom-card {
+    font-weight: 600;
+    font-size: 12px !important;
+    line-height: 18px;
+}
+.THIS h1 {
+    font-family: Playfair Display;
+    font-weight: 500px !important;
+    font-size: 32px !important;
+}
+.THIS h1.slds-text-heading_medium.slds-hyphenate {
+    font-family: Playfair Display !important;
+    font-size: 40px !important;
+}
+
+.THIS .slds-form-element__control.slds-grow {
+    width: 380px;
+}
+.THIS .cStripeComponent .slds-modal__content.slds-p-around--large {
+    width: 950px !important;
+}
+.THIS lightning-input-field.slds-form-element.slds-form-element_horizontal {
+    margin-right: -100px;
+    padding-right: 5px;
+    padding-left: -900px;
+}
+
+ .THIS  .slds-modal__container {
+        margin: 0 auto;
+        min-width: 20rem;
+        width: 900px;
+        padding: 5px;
+    	height: 400px;
+	    background-color: #3072A7 !important;
+}
+/*.THIS input#input-109 {
+    width: 300px;
+}
+.THIS input#input-110 {
+    width: 300px;
+}
+.THIS input#input-111 {
+    width: 300px;
+}
+.THIS input#input-112 {
+    width: 300px;
+}
+.THIS input#input-113 {
+    width: 300px;
+}
+.THIS input#input-114 {
+    width: 300px;
+}*/
+
+.THIS .myCustomClass input{ 
+    width: 300px !important;
+}
+
+.THIS .highlight-red {
+    border: 1px solid red; /* Example of highlighting with red border */
+}
+
+.THIS .field-container {
+    display: flex;
+    align-items: center;
+}
+
+.THIS .note {
+    margin-left: -395px !important;
+    font-size: medium;
+    font-weight: 400;
+}
